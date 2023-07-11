@@ -114,8 +114,8 @@ render() {
   return (
     <div id="wrapper" className={className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates {this.x}, {this.y}</h3>
-        <h3 id="steps">You moved {this.Steps} times</h3>
+        <h3 id="coordinates">Coordinates {this.state.x}, {this.state.y}</h3>
+        <h3 id="steps">You moved {this.state.Steps} times</h3>
       </div>
       <div id="grid">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((idx) => (

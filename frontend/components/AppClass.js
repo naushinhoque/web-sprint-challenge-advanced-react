@@ -23,13 +23,15 @@ export default class AppClass extends React.Component {
     if (Index < 3) y = 1
     else if (Index < 6) y = 2
     else if (Index < 9) y = 3
+
+    this.setState({ x: x, y: y})
+
     return [x, y]
   }
 
   getXYMessage = () => {
     const [x, y] = this.getXY()
-    this.setState({ x: x, y: y})
-    return `Coordinates (${x}, ${y})`
+    return `(${x}, ${y})`
   }
 
   reset = () => {
@@ -37,7 +39,9 @@ export default class AppClass extends React.Component {
       Message: '',
       Email: '',
       Steps: 0,
-      Index: 4
+      Index: 4,
+      x: 2,
+      y: 2
     });
   }
 
@@ -99,7 +103,9 @@ export default class AppClass extends React.Component {
       Message: '',
       Email: '',
       Steps: 0,
-      Index: 4
+      Index: 4,
+      x: 2,
+      y: 2
     }));
   }
 
@@ -108,7 +114,7 @@ render() {
   return (
     <div id="wrapper" className={className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates {this.getXYMessage()}</h3>
+        <h3 id="coordinates">Coordinates {this.x}, {this.y}</h3>
         <h3 id="steps">You moved {this.Steps} times</h3>
       </div>
       <div id="grid">
@@ -138,37 +144,5 @@ render() {
 }
 
 
-  //render() {
-  //  const { className } = this.props
-  //  return (
-  //  <div id="wrapper" className={className}>
-  //  <div className="info">
-  //    <h3 id="coordinates">Coordinates {this.getXYMessage()}</h3>
-  //    <h3 id="steps">You moved {this.Steps} times</h3>
-  //  </div>
-  //  <div id="grid">
-  //    {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((idx) => (
-  //      <div key={idx} className={`square${idx === this.state.Index ? ' active' : ''}`}>
-  //        {idx === this.state.Index ? 'B' : null}
-  //      </div>
-  //    ))}
-  //  </div>
-  //  <div className="info">
-  //    <h3 id="message">{this.state.Message} </h3>
-  //  </div>
-  //  <div id="keypad">
-  //        <button id="left" onClick={this.move}>LEFT</button>
-  //        <button id="up" onClick={this.move}>UP</button>
-  //        <button id="right" onClick={this.move}>RIGHT</button>
-  //        <button id="down" onClick={this.move}>DOWN</button>
-  //        <button id="reset" onClick={this.reset}>reset</button>
-  //      </div>
-  //      <form>
-  //        <input id="email" type="email" placeholder="type email" onChange={this.onChange}></input>
-  //        <input id="submit" type="submit" onClick={this.onSubmit}></input>
-  //      </form>
-  //    </div>
-  //  )
-  //}
 
-
+//{this.getXYMessage()}

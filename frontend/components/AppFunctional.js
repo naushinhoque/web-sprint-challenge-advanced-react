@@ -1,106 +1,107 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'
 
 const initialMessage = '';
 
 export default function AppFunctional(props) {
-  // THE FOLLOWING HELPERS ARE JUST RECOMMENDATIONS.
-  // You can delete them and build your own logic from scratch.
-  const [state, setState] = useState({
-    Message: '',
-    Email: '',
-    Steps: 0,
-    Index: 4,
-  });
+  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState('');
+  const [steps, setSteps] = useState(0);
+  const [index, setIndex] = useState(4);
+  const [x, setX] = useState(2);
+  const [y, setY] = useState(2);
 
-  function getXY() {
-    // It it not necessary to have a state to track the coordinates.
-    // It's enough to know what index the "B" is at, to be able to calculate them.
-    const { Index } = state;
-    const x = (Index % 3) + 1;
-    let y;
-    if (Index < 3) y = 1;
-    else if (Index < 6) y = 2;
-    else if (Index < 9) y = 3;
-    return [x, y];
-  }
+  const getXY = () => {
+    const calculatedX = (index % 3) + 1;
+    let calculatedY;
+    if (index < 3) calculatedY = 1;
+    else if (index < 6) calculatedY = 2;
+    else if (index < 9) calculatedY = 3;
+    return [calculatedX, calculatedY];
+  };
 
-  function getXYMessage() {
-    // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
-    // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
-    // returns the fully constructed string.
-    const [x, y] = getXY();
-    return `Coordinates (${x}, ${y})`;
-  }
-
-  function reset() {
-    // Use this helper to reset all states to their initial values.
-    setState((prevState) => ({
-      ...prevState,
-      Message: '',
-      Email: '',
-      Steps: 0,
-      Index: 4,
-    }));
-  }
+  const reset = () => {
+    setMessage('');
+    setEmail('');
+    setSteps(0);
+    setIndex(4);
+    setX(2);
+    setY(2);
+  };
 
   function getNextIndex(direction) {
-    // This helper takes a direction ("left", "up", etc) and calculates what the next index
-    // of the "B" would be. If the move is impossible because we are at the edge of the grid,
-    // this helper should return the current index unchanged.
-    const { Index } = state;
     switch (direction) {
       case 'up':
-        return Index < 3 ? Index : Index - 3;
+        return index < 3 ? index : index - 3;
       case 'down':
-        return Index > 5 ? Index : Index + 3;
+        return index > 5 ? index : index + 3;
       case 'left':
-        return Index % 3 === 0 ? Index : Index - 1;
+        return index % 3 === 0 ? index : index - 1;
       case 'right':
-        return (Index - 2) % 3 === 0 ? Index : Index + 1;
+        return (index - 2) % 3 === 0 ? index : index + 1;
       default:
-        return Index;
+        return index;
     }
   }
 
-  function move(evt) {
-    // This event handler can use the helper above to obtain a new index for the "B",
-    // and change any states accordingly.
+  const move = (evt) => {
     const direction = evt.target.id;
     const nextIndex = getNextIndex(direction);
-    setState((prevState) => ({
-      ...prevState,
-      Steps: prevState.Steps + 1,
-      Message: initialMessage,
-      Index: nextIndex,
-    }));
-  }
+    setSteps((prevSteps) => prevSteps + 1);
+    setMessage(initialMessage);
+    setIndex(nextIndex);
+  };
 
-  function onChange(evt) {
-    // You will need this to update the value of the input.
+  const onChange = (evt) => {
     const { value } = evt.target;
-    setState((prevState) => ({
-      ...prevState,
-      Email: value,
-    }));
-  }
-
-  function onSubmit(evt) {
-    // Use a POST request to send a payload to the server.
+    setEmail(value);
+  };
+  
+  const onSubmit = (evt) => {
     evt.preventDefault();
-    const { Email } = state;
-    console.log('Email:', Email);
-  }
+
+    axios
+      .post('http://localhost:9000/api/result', {
+        x,
+        y,
+        steps,
+        email,
+      })
+      .then((res) => {
+        if (res.ok) {
+          console.log('Email sent successfully');
+        } else {
+          console.log('Failed to send email');
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
+    // Reset coordinates and steps
+    reset();
+  };
+
+  const updateCoordinates = () => {
+    const [calculatedX, calculatedY] = getXY();
+    setX(calculatedX);
+    setY(calculatedY);
+  };
+
+  useEffect(() => {
+    updateCoordinates();
+  }, [index]);
 
   return (
-    <div id="wrapper">
+    <div id="wrapper" className={props.className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates {getXYMessage()}</h3>
-        <h3 id="steps">You moved {state.Steps} times</h3>
+        <h3 id="coordinates">Coordinates ({x}, {y})</h3>
+        <h3 id="steps">You moved {steps} times</h3>
       </div>
       <div id="grid">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((idx) => (
-          <div key={idx} className={`square${idx === state.Index ? ' active' : ''}`}>
-            {idx === state.Index ? 'B' : null}
+          <div key={idx} className={`square${idx === index ? ' active' : ''}`}>
+            {idx === index ? 'B' : null}
           </div>
         ))}
       </div>

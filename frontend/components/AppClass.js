@@ -109,12 +109,28 @@ export default class AppClass extends React.Component {
     }));
   }
 
+  updateCoordinates = () => {
+    const [x, y] = this.getXY();
+    this.setState({ x, y });
+  };
+
+  componentDidMount() {
+    this.updateCoordinates();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.Index !== this.state.Index) {
+      this.updateCoordinates();
+    }
+  }
+ 
+
 render() {
   const { className } = this.props;
   return (
     <div id="wrapper" className={className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates {this.state.x}, {this.state.y}</h3>
+        <h3 id="coordinates">Coordinates ({this.state.x}, {this.state.y})</h3>
         <h3 id="steps">You moved {this.state.Steps} times</h3>
       </div>
       <div id="grid">
@@ -146,3 +162,8 @@ render() {
 
 
 //{this.getXYMessage()}
+//componentDidUpdate(prevProps, prevState) {
+//  if (prevState.x !== this.state.x) {
+//    console.log('x state has changed.')
+//  }
+//}

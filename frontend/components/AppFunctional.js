@@ -74,14 +74,18 @@ export default function AppFunctional(props) {
         email,
       })
       .then((res) => {
-        if (res.ok) {
+        if (res.status === 200) {
           console.log('Email sent successfully');
         } else {
           console.log('Failed to send email');
         }
       })
       .catch((error) => {
-        setError(error.response.data.message); // Update the error state
+        if (error.response && error.response.data && error.response.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError('An error occurred. Please try again later.');
+        }
         console.error('Error:', error);
       });
 
@@ -113,7 +117,7 @@ export default function AppFunctional(props) {
         ))}
       </div>
       <div className="info">
-        <h3 id="message"> </h3>
+        <h3 id="message">{error} </h3>
       </div>
       <div id="keypad">
         <button id="left" onClick={move}>

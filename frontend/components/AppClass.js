@@ -1,101 +1,96 @@
-import React from 'react'
-import axios from 'axios'
+import React from 'react';
+import axios from 'axios';
 
-const initialMessage = ''
+const initialMessage = '';
 
 export default class AppClass extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      Message: '',
-      Email: '',
-      Steps: 0,
-      Index: 4,
+      message: '',
+      email: '',
+      steps: 0,
+      index: 4,
       x: 2,
       y: 2,
-      errorMessage: ''
+      error: '',
     };
   }
 
-  getXY = (gridSize, cellIndex) => {
-    const { Index } = this.state
-    const x = (Index % 3) + 1
-    let y
-    if (Index < 3) y = 1
-    else if (Index < 6) y = 2
-    else if (Index < 9) y = 3
-
-    this.setState({ x: x, y: y})
-
-    return [x, y]
-  }
-
-  getXYMessage = () => {
-    const [x, y] = this.getXY()
-    return `(${x}, ${y})`
-  }
+  getXY = () => {
+    const calculatedX = (this.state.index % 3) + 1;
+    let calculatedY;
+    if (this.state.index < 3) calculatedY = 1;
+    else if (this.state.index < 6) calculatedY = 2;
+    else if (this.state.index < 9) calculatedY = 3;
+    return [calculatedX, calculatedY];
+  };
 
   reset = () => {
     this.setState({
-      Message: '',
-      Email: '',
-      Steps: 0,
-      Index: 4,
+      message: '',
+      email: '',
+      steps: 0,
+      index: 4,
       x: 2,
-      y: 2
+      y: 2,
+      error: '',
     });
-  }
+  };
 
   getNextIndex = (direction) => {
-    const { Index } = this.state
+    const { index } = this.state;
     switch (direction) {
       case 'up':
-        return (Index < 3) ? Index : Index - 3
+        return index < 3 ? index : index - 3;
       case 'down':
-        return (Index > 5) ? Index : Index + 3
+        return index > 5 ? index : index + 3;
       case 'left':
-        return (Index % 3 === 0) ? Index : Index - 1
+        return index % 3 === 0 ? index : index - 1;
       case 'right':
-        return ((Index - 2) % 3 === 0) ? Index : Index + 1
+        return (index - 2) % 3 === 0 ? index : index + 1;
+      default:
+        return index;
     }
-    return nextIndex;
-  }
+  };
 
   move = (evt) => {
-    console.log('up');
-    console.log(evt);
     const direction = evt.target.id;
     const nextIndex = this.getNextIndex(direction);
-    const steps = this.state.Steps + 1;
-    this.setState({
-      ...this.state,
-      Steps: this.state.Steps + 1,
-      Message: initialMessage,
-      Index: nextIndex,
-    });
-  }
+    this.setState((prevState) => ({
+      steps: prevState.steps + 1,
+      message: initialMessage,
+      index: nextIndex,
+    }));
+  };
 
   onChange = (evt) => {
-    this.setState({ Email: evt.target.value });
-  }
+    const { value } = evt.target;
+    this.setState({
+      email: value,
+    });
+  };
 
   onSubmit = (evt) => {
     evt.preventDefault();
-    const { x, y, steps, email } = this.state;
-  
-    if (email === 'foo@bar.baz') {
+
+    if (this.state.email === 'foo@bar.baz') {
       this.setState({ error: 'foo@bar.baz failure #23' });
-      return; // Stop further execution
+      return;
     }
 
-    axios.post('http://localhost:9000/api/result', {
-      "x": this.state.x, "y": this.state.y, "steps": this.state.Steps, "email": this.state.Email
-    })
-      .then(res => {
-        if (res.ok) {
+    axios
+      .post('http://localhost:9000/api/result', {
+        x: this.state.x,
+        y: this.state.y,
+        steps: this.state.steps,
+        email: this.state.email,
+      })
+      .then((res) => {
+        if (res.status === 200) {
           console.log('Email sent successfully');
         } else {
-          console.log('Failed to send email')
+          console.log('Failed to send email');
         }
       })
       .catch((error) => {
@@ -107,67 +102,62 @@ export default class AppClass extends React.Component {
         console.error('Error:', error);
       });
 
-    // Reset coordinates and steps
-    this.setState((prevState) => ({
-      ...prevState,
-      Message: '',
-      Email: '',
-      Steps: 0,
-      Index: 4,
-      x: 2,
-      y: 2
-    }));
-  }
+    this.reset();
+  };
 
   updateCoordinates = () => {
-    const [x, y] = this.getXY();
-    this.setState({ x, y });
+    const [calculatedX, calculatedY] = this.getXY();
+    this.setState({
+      x: calculatedX,
+      y: calculatedY,
+    });
   };
 
   componentDidMount() {
     this.updateCoordinates();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.Index !== this.state.Index) {
-      this.updateCoordinates();
-    }
+  render() {
+    return (
+      <div id="wrapper" className={this.props.className}>
+        <div className="info">
+          <h3 id="coordinates">Coordinates ({this.state.x}, {this.state.y})</h3>
+          <h3 id="steps">You moved {this.state.steps} times</h3>
+        </div>
+        <div id="grid">
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((idx) => (
+            <div key={idx} className={`square${idx === this.state.index ? ' active' : ''}`}>
+              {idx === this.state.index ? 'B' : null}
+            </div>
+          ))}
+        </div>
+        <div className="info">
+          <h3 id="message">{this.state.error}</h3>
+        </div>
+        <div id="keypad">
+          <button id="left" onClick={this.move}>
+            LEFT
+          </button>
+          <button id="up" onClick={this.move}>
+            UP
+          </button>
+          <button id="right" onClick={this.move}>
+            RIGHT
+          </button>
+          <button id="down" onClick={this.move}>
+            DOWN
+          </button>
+          <button id="reset" onClick={this.reset}>
+            reset
+          </button>
+        </div>
+        <form onSubmit={this.onSubmit}>
+          <input id="email" type="email" onChange={this.onChange} value={this.state.email} />
+          <input id="submit" type="submit" />
+        </form>
+      </div>
+    );
   }
- 
-
-render() {
-  const { className } = this.props;
-  const { error } = this.state;
-  return (
-    <div id="wrapper" className={className}>
-      <div className="info">
-        <h3 id="coordinates">Coordinates ({this.state.x}, {this.state.y})</h3>
-        <h3 id="steps">You moved {this.state.Steps} times</h3>
-      </div>
-      <div id="grid">
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((idx) => (
-          <div key={idx} className={`square${idx === this.state.Index ? ' active' : ''}`}>
-            {idx === this.state.Index ? 'B' : null}
-          </div>
-        ))}
-      </div>
-      <div className="info">
-        <h3 id="message">{this.state.Message}</h3>
-      </div>
-      <div id="keypad">
-        <button id="left" onClick={this.move}>LEFT</button>
-        <button id="up" onClick={this.move}>UP</button>
-        <button id="right" onClick={this.move}>RIGHT</button>
-        <button id="down" onClick={this.move}>DOWN</button>
-        <button id="reset" onClick={this.reset}>reset</button>
-      </div>
-      <form>
-        <input id="email" type="email" placeholder="type email" onChange={this.onChange}></input>
-        <input id="submit" type="submit" onClick={this.onSubmit}></input>
-      </form>
-    </div>
-  );
-}
 }
 
 

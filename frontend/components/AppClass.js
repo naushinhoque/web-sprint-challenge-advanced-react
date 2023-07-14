@@ -12,7 +12,8 @@ export default class AppClass extends React.Component {
       Steps: 0,
       Index: 4,
       x: 2,
-      y: 2
+      y: 2,
+      errorMessage: ''
     };
   }
 
@@ -80,7 +81,12 @@ export default class AppClass extends React.Component {
 
   onSubmit = (evt) => {
     evt.preventDefault();
-    const { Email } = this.state;
+    const { x, y, steps, email } = this.state;
+  
+    if (email === 'foo@bar.baz') {
+      this.setState({ error: 'foo@bar.baz failure #23' });
+      return; // Stop further execution
+    }
 
     axios.post('http://localhost:9000/api/result', {
       "x": this.state.x, "y": this.state.y, "steps": this.state.Steps, "email": this.state.Email
@@ -92,10 +98,14 @@ export default class AppClass extends React.Component {
           console.log('Failed to send email')
         }
       })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-    
+      .catch((error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.setState({ error: error.response.data.message });
+        } else {
+          this.setState({ error: 'An error occurred. Please try again later.' });
+        }
+        console.error('Error:', error);
+      });
 
     // Reset coordinates and steps
     this.setState((prevState) => ({
@@ -127,6 +137,7 @@ export default class AppClass extends React.Component {
 
 render() {
   const { className } = this.props;
+  const { error } = this.state;
   return (
     <div id="wrapper" className={className}>
       <div className="info">
@@ -160,10 +171,3 @@ render() {
 }
 
 
-
-//{this.getXYMessage()}
-//componentDidUpdate(prevProps, prevState) {
-//  if (prevState.x !== this.state.x) {
-//    console.log('x state has changed.')
-//  }
-//}

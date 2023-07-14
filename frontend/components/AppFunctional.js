@@ -10,6 +10,7 @@ export default function AppFunctional(props) {
   const [index, setIndex] = useState(4);
   const [x, setX] = useState(2);
   const [y, setY] = useState(2);
+  const [error, setError] = useState('');
 
   const getXY = () => {
     const calculatedX = (index % 3) + 1;
@@ -56,9 +57,14 @@ export default function AppFunctional(props) {
     const { value } = evt.target;
     setEmail(value);
   };
-  
+
   const onSubmit = (evt) => {
     evt.preventDefault();
+
+    if (email === 'foo@bar.baz') {
+      setError('foo@bar.baz failure #23');
+      return;
+    }
 
     axios
       .post('http://localhost:9000/api/result', {
@@ -75,6 +81,7 @@ export default function AppFunctional(props) {
         }
       })
       .catch((error) => {
+        setError(error.response.data.message); // Update the error state
         console.error('Error:', error);
       });
 
@@ -126,7 +133,7 @@ export default function AppFunctional(props) {
         </button>
       </div>
       <form onSubmit={onSubmit}>
-        <input id="email" type="email"></input>
+      <input id="email" type="email" onChange={onChange} value={email} />
         <input id="submit" type="submit"></input>
       </form>
     </div>

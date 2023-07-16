@@ -57,11 +57,42 @@ export default class AppClass extends React.Component {
   move = (evt) => {
     const direction = evt.target.id;
     const nextIndex = this.getNextIndex(direction);
-    this.setState((prevState) => ({
-      steps: prevState.steps + 1,
-      message: initialMessage,
+    let message = initialMessage;
+
+    // Check for consecutive "right" movements
+    if (direction === 'right' && nextIndex === this.getNextIndex('right')) {
+      const [calculatedX, calculatedY] = this.getXY();
+      message = `(${calculatedX},${calculatedY})`;
+    }
+    
+    // Check for consecutive "down" movements
+    if (direction === 'down' && nextIndex === this.getNextIndex('down')) {
+      message = "You can't go down";
+    }
+
+    // Check for consecutive "left" movements
+    if (direction === 'left' && nextIndex === this.getNextIndex('left')) {
+      message = "You can't go left";
+    }
+
+    // Check for other limit reached cases
+    if (nextIndex === this.state.index) {
+      if (this.state.index === this.getNextIndex('up')) {
+        message = "You can't go up";
+      } else if (this.state.index === this.getNextIndex('right')) {
+        message = "You can't go right";
+      }
+    } else {
+      // Only increment steps when there is an actual movement
+      this.setState((prevState) => ({
+        steps: prevState.steps + 1,
+      }));
+    }
+
+    this.setState({
+      message: message,
       index: nextIndex,
-    }));
+    });
   };
 
   onChange = (evt) => {
@@ -132,7 +163,7 @@ export default class AppClass extends React.Component {
           ))}
         </div>
         <div className="info">
-          <h3 id="message">{this.state.error}</h3>
+          <h3 id="message">{this.state.message}</h3>
         </div>
         <div id="keypad">
           <button id="left" onClick={this.move}>

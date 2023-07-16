@@ -26,6 +26,7 @@ export default class AppClass extends React.Component {
     return [calculatedX, calculatedY];
   };
 
+  //Reset message to empty string 
   reset = () => {
     this.setState({
       message: '',

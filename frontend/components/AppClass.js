@@ -59,35 +59,42 @@ export default class AppClass extends React.Component {
 
   move = (evt) => {
     const direction = evt.target.id;
-
+  
     if (direction === 'up' && this.state.index < 3) {
       this.setState({ message: "You can't go up" });
       return;
     }
-
+  
     if (direction === 'down' && this.state.index > 5) {
       this.setState({ message: "You can't go down" });
       return;
     }
-
+  
     if (direction === 'right' && (this.state.index + 1) % 3 === 0) {
       this.setState({ message: "You can't go right" });
       return;
     }
-
+  
     if (direction === 'left' && this.state.index % 3 === 0) {
       this.setState({ message: "You can't go left" });
       return;
     }
-
-    const nextIndex = this.getNextIndex(direction);
-    this.setState((prevState) => ({
-      steps: prevState.steps + 1,
-      message: initialMessage,
-      index: nextIndex,
-    }));
+  
+    this.setState(
+      (prevState) => {
+        const nextIndex = this.getNextIndex(direction);
+        return {
+          steps: prevState.steps + 1,
+          message: initialMessage,
+          index: nextIndex,
+        };
+      },
+      () => {
+        this.updateCoordinates(); // Call updateCoordinates() in the callback function of setState()
+      }
+    );
   };
-
+  
   onChange = (evt) => {
     const { value } = evt.target;
     this.setState({

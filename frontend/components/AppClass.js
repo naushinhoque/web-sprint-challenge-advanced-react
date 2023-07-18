@@ -90,11 +90,11 @@ export default class AppClass extends React.Component {
         };
       },
       () => {
-        this.updateCoordinates(); // Call updateCoordinates() in the callback function of setState()
+        this.updateCoordinates(); 
       }
     );
   };
-  
+
   onChange = (evt) => {
     const { value } = evt.target;
     this.setState({
@@ -108,7 +108,8 @@ export default class AppClass extends React.Component {
     const { email, x, y, steps } = this.state;
 
     if (email === 'foo@bar.baz') {
-      this.setState({ error: 'foo@bar.baz failure #23' });
+      const errorMessage = index === 5 ? 'foo@bar.baz failure #71' : 'foo@bar.baz failure #23';
+      this.setState({ error: errorMessage });
       return;
     }
 

@@ -11,6 +11,7 @@ export default function AppFunctional(props) {
   const [x, setX] = useState(2);
   const [y, setY] = useState(2);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const getXY = () => {
     const calculatedX = (index % 3) + 1;
@@ -28,6 +29,8 @@ export default function AppFunctional(props) {
     setIndex(4);
     setX(2);
     setY(2);
+    setSuccessMessage('');
+    setError('');
   };
 
   function getNextIndex(direction) {
@@ -47,6 +50,27 @@ export default function AppFunctional(props) {
 
   const move = (evt) => {
     const direction = evt.target.id;
+  
+    if (direction === 'up' && index < 3) {
+      setMessage("You can't go up");
+      return;
+    }
+  
+    if (direction === 'down' && index > 5) {
+      setMessage("You can't go down");
+      return;
+    }
+
+    if (direction === 'right' && (index + 1) % 3 === 0) {
+      setMessage("You can't go right");
+      return;
+    }
+
+    if (direction === 'left' && index % 3 === 0) {
+      setMessage("You can't go left");
+      return;
+    }
+
     const nextIndex = getNextIndex(direction);
     setSteps((prevSteps) => prevSteps + 1);
     setMessage(initialMessage);
@@ -75,6 +99,7 @@ export default function AppFunctional(props) {
       })
       .then((res) => {
         if (res.status === 200) {
+          setSuccessMessage(res.data.message);
           console.log('Email sent successfully');
         } else {
           console.log('Failed to send email');
@@ -107,7 +132,7 @@ export default function AppFunctional(props) {
     <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">Coordinates ({x}, {y})</h3>
-        <h3 id="steps">You moved {steps} times</h3>
+        <h3 id="steps">You moved {steps} {steps === 1 ? 'time' : 'times'}</h3>
       </div>
       <div id="grid">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((idx) => (
@@ -117,7 +142,9 @@ export default function AppFunctional(props) {
         ))}
       </div>
       <div className="info">
-        <h3 id="message">{error} </h3>
+         <h3 id="message">{message}</h3>
+         <h3 id="message">{error}</h3>
+         <h3 id="success-message">{successMessage}</h3>
       </div>
       <div id="keypad">
         <button id="left" onClick={move}>

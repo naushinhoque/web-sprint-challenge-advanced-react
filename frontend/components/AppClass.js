@@ -14,6 +14,7 @@ export default class AppClass extends React.Component {
       x: 2,
       y: 2,
       error: '',
+      successMessage: '',
     };
   }
 
@@ -36,6 +37,7 @@ export default class AppClass extends React.Component {
       x: 2,
       y: 2,
       error: '',
+      successMessage: '',
     });
   };
 
@@ -57,43 +59,33 @@ export default class AppClass extends React.Component {
 
   move = (evt) => {
     const direction = evt.target.id;
+
+    if (direction === 'up' && this.state.index < 3) {
+      this.setState({ message: "You can't go up" });
+      return;
+    }
+
+    if (direction === 'down' && this.state.index > 5) {
+      this.setState({ message: "You can't go down" });
+      return;
+    }
+
+    if (direction === 'right' && (this.state.index + 1) % 3 === 0) {
+      this.setState({ message: "You can't go right" });
+      return;
+    }
+
+    if (direction === 'left' && this.state.index % 3 === 0) {
+      this.setState({ message: "You can't go left" });
+      return;
+    }
+
     const nextIndex = this.getNextIndex(direction);
-    let message = initialMessage;
-
-    // Check for consecutive "right" movements
-    if (direction === 'right' && nextIndex === this.getNextIndex('right')) {
-      const [calculatedX, calculatedY] = this.getXY();
-      message = `(${calculatedX},${calculatedY})`;
-    }
-    
-    // Check for consecutive "down" movements
-    if (direction === 'down' && nextIndex === this.getNextIndex('down')) {
-      message = "You can't go down";
-    }
-
-    // Check for consecutive "left" movements
-    if (direction === 'left' && nextIndex === this.getNextIndex('left')) {
-      message = "You can't go left";
-    }
-
-    // Check for other limit reached cases
-    if (nextIndex === this.state.index) {
-      if (this.state.index === this.getNextIndex('up')) {
-        message = "You can't go up";
-      } else if (this.state.index === this.getNextIndex('right')) {
-        message = "You can't go right";
-      }
-    } else {
-      // Only increment steps when there is an actual movement
-      this.setState((prevState) => ({
-        steps: prevState.steps + 1,
-      }));
-    }
-
-    this.setState({
-      message: message,
+    this.setState((prevState) => ({
+      steps: prevState.steps + 1,
+      message: initialMessage,
       index: nextIndex,
-    });
+    }));
   };
 
   onChange = (evt) => {
@@ -106,20 +98,23 @@ export default class AppClass extends React.Component {
   onSubmit = (evt) => {
     evt.preventDefault();
 
-    if (this.state.email === 'foo@bar.baz') {
+    const { email, x, y, steps } = this.state;
+
+    if (email === 'foo@bar.baz') {
       this.setState({ error: 'foo@bar.baz failure #23' });
       return;
     }
 
     axios
       .post('http://localhost:9000/api/result', {
-        x: this.state.x,
-        y: this.state.y,
-        steps: this.state.steps,
-        email: this.state.email,
+        x,
+        y,
+        steps,
+        email,
       })
       .then((res) => {
         if (res.status === 200) {
+          this.setState({ successMessage: res.data.message });
           console.log('Email sent successfully');
         } else {
           console.log('Failed to send email');
@@ -134,6 +129,7 @@ export default class AppClass extends React.Component {
         console.error('Error:', error);
       });
 
+    // Reset coordinates and steps
     this.reset();
   };
 
@@ -150,11 +146,21 @@ export default class AppClass extends React.Component {
   }
 
   render() {
+    const {
+      message,
+      email,
+      steps,
+      index,
+      x,
+      y,
+      error,
+      successMessage,
+    } = this.state;
     return (
       <div id="wrapper" className={this.props.className}>
         <div className="info">
           <h3 id="coordinates">Coordinates ({this.state.x}, {this.state.y})</h3>
-          <h3 id="steps">You moved {this.state.steps} times</h3>
+          <h3 id="steps">You moved {this.state.steps} {steps === 1 ? 'time' : 'times'}</h3>
         </div>
         <div id="grid">
           {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((idx) => (
@@ -165,6 +171,8 @@ export default class AppClass extends React.Component {
         </div>
         <div className="info">
           <h3 id="message">{this.state.message}</h3>
+          <h3 id="message">{this.state.error}</h3>
+          <h3 id="success-message">{this.state.successMessage}</h3>
         </div>
         <div id="keypad">
           <button id="left" onClick={this.move}>

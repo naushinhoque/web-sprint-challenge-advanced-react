@@ -1,13 +1,14 @@
-//import React from 'react';
-//import { render, screen, fireEvent } from '@testing-library/react';
-//import AppClass from './AppClass'; 
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import AppClass from './AppClass'; 
 
-//describe('App', () => {
-//  test('renders coordinates heading', () => {
-//    render(<AppClass />);
-//    const coordinatesHeading = screen.getByText(/Coordinates/i);
-//    expect(coordinatesHeading).toBeInTheDocument();
-//  });
+describe('App', () => {
+  test('renders coordinates heading', () => {
+    render(<AppClass />);
+    const coordinatesHeading = screen.getByText(/Coordinates/i);
+    expect(coordinatesHeading).toBeInTheDocument();
+  });
+})
 
 //  test('renders steps heading', () => {
 //    render(<AppClass />);
@@ -35,6 +36,3 @@
 //    expect(emailInput.value).toBe(testEmail)
 //  });
 //})
-
-
-

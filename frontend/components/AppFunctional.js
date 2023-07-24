@@ -93,7 +93,8 @@ export default function AppFunctional(props) {
       })
       .then((res) => {
         if (res.status === 200) {
-          setSuccessMessage(res.data.message);
+          setSuccessMessage(res.data.message,);
+          setEmail("");
           console.log('Email sent successfully');
         } else {
           console.log('Failed to send email');

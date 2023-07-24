@@ -118,7 +118,7 @@ export default class AppClass extends React.Component {
       })
       .then((res) => {
         if (res.status === 200) {
-          this.setState({ successMessage: res.data.message });
+          this.setState({ successMessage: res.data.message, email: ""});
           console.log('Email sent successfully');
         } else {
           console.log('Failed to send email');
@@ -134,11 +134,11 @@ export default class AppClass extends React.Component {
       });
 
      //Reset coordinates and steps
-     if (!email.trim() && !movedBeforeSubmit) {
-      this.reset();
-    } else {
-      this.setState({ movedBeforeSubmit: false }); // Reset the flag for the next submission
-    }
+    //if (!email.trim() && !movedBeforeSubmit) {
+    //  this.reset();
+    //} else {
+    //  this.setState({ movedBeforeSubmit: false }); // Reset the flag for the next submission
+    //}
   };
   
 

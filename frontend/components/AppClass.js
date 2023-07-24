@@ -107,11 +107,11 @@ export default class AppClass extends React.Component {
 
     const { email, x, y, steps } = this.state;
 
-    if (email === 'foo@bar.baz') {
-      const errorMessage = index === 5 ? 'foo@bar.baz failure #71' : 'foo@bar.baz failure #23';
-      this.setState({ error: errorMessage });
-      return;
-    }
+    //if (email === 'foo@bar.baz') {
+    //  const errorMessage = index === 5 ? 'foo@bar.baz failure #71' : 'foo@bar.baz failure #23';
+    //  this.setState({ error: errorMessage });
+    //  return;
+    //}
 
     axios
       .post('http://localhost:9000/api/result', {

@@ -35,3 +35,6 @@ describe('App', () => {
     expect(emailInput.value).toBe(testEmail)
   });
 })
+
+
+

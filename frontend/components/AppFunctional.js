@@ -85,10 +85,11 @@ export default function AppFunctional(props) {
   const onSubmit = (evt) => {
     evt.preventDefault();
 
-    if (email === 'foo@bar.baz') {
-      setError('foo@bar.baz failure #23');
-      return;
-    }
+    //if (email === 'foo@bar.baz') {
+    //  const errorMessage = index === 5 ? 'foo@bar.baz failure #71' : 'foo@bar.baz failure #23';
+    //  setState({ ...state, error: errorMessage });
+    //  return;
+    //}
 
     axios
       .post('http://localhost:9000/api/result', {
@@ -106,6 +107,7 @@ export default function AppFunctional(props) {
         }
       })
       .catch((error) => {
+        console.log(error.response.data.message)
         if (error.response && error.response.data && error.response.data.message) {
           setError(error.response.data.message);
         } else {

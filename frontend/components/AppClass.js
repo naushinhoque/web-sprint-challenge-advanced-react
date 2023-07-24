@@ -79,6 +79,10 @@ export default class AppClass extends React.Component {
       this.setState({ message: "You can't go left" });
       return;
     }
+
+    if (direction === 'up' || direction === 'right') {
+      this.setState({ movedBeforeSubmit: true }); // Set the flag if UP or RIGHT is clicked
+    }
   
     this.setState(
       (prevState) => {
@@ -104,15 +108,7 @@ export default class AppClass extends React.Component {
 
   onSubmit = (evt) => {
     evt.preventDefault();
-
-    const { email, x, y, steps } = this.state;
-
-    //if (email === 'foo@bar.baz') {
-    //  const errorMessage = index === 5 ? 'foo@bar.baz failure #71' : 'foo@bar.baz failure #23';
-    //  this.setState({ error: errorMessage });
-    //  return;
-    //}
-
+    const { email, x, y, steps, movedBeforeSubmit} = this.state;
     axios
       .post('http://localhost:9000/api/result', {
         x,
@@ -137,9 +133,14 @@ export default class AppClass extends React.Component {
         console.error('Error:', error);
       });
 
-    // Reset coordinates and steps
-    this.reset();
+     //Reset coordinates and steps
+     if (!email.trim() && !movedBeforeSubmit) {
+      this.reset();
+    } else {
+      this.setState({ movedBeforeSubmit: false }); // Reset the flag for the next submission
+    }
   };
+  
 
   updateCoordinates = () => {
     const [calculatedX, calculatedY] = this.getXY();
